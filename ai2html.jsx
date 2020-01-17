@@ -387,6 +387,7 @@ var outputFallbacks = function() {
 	var fallbackPath = new File(pathComponents.join('/') + '/' + slug + '/fallbacks/' + slug + '-fallback');
 	var applePath = new File(pathComponents.join('/') + '/' + slug + '/fallbacks/' + slug + '-apple');
 	var socialPath = new File(pathComponents.join('/') + '/' + slug + '/fallbacks/' + slug + '-social');
+	var squarePath = new File(pathComponents.join('/') + '/' + slug + '/fallbacks/' + slug + '-fallback-square');
 
 	var exportOptions = new ExportOptionsPNG24();
 	exportOptions.horizontalScale = 300;
@@ -399,20 +400,31 @@ var outputFallbacks = function() {
 
 	var artboards = doc.artboards;
 
-	var process = function (ab, file, addPadding) {
-
+	var process = function (ab, file, options) {
+		options = options || {};
 		var original = ab.artboardRect;
 
-		var newRect = [
-			original[0] - 20,
-			original[1] + 20,
-			original[2] + 20,
-			original[3] - 20
-		]
+		var newRect = original.slice()
 
-		if (addPadding === true) {
-			ab.artboardRect = newRect
+		if (options.addPadding === true) {
+			newRect = [
+				newRect[0] - 20,
+				newRect[1] + 20,
+				newRect[2] + 20,
+				newRect[3] - 20
+			];
 		}
+
+		if (options.square === true) {
+			newRect = [
+				newRect[0],
+				newRect[2],
+				newRect[2],
+				newRect[0]
+			];
+		}
+
+		ab.artboardRect = newRect
 
 		doc.exportFile(file, type, exportOptions);
 		ab.artboardRect = original
@@ -423,16 +435,17 @@ var outputFallbacks = function() {
 
 		if (abname === 'tablet:574') {
 			artboards.setActiveArtboardIndex(i)
-			process(artboards[i], fallbackPath, false)
+			process(artboards[i], fallbackPath)
+			process(artboards[i], squarePath, { square: true })
 
 		}
 		if (abname === 'mobile-large:336') {
 			artboards.setActiveArtboardIndex(i)
-			process(artboards[i], applePath, true)
+			process(artboards[i], applePath, {addPadding: true})
 		}
 		if (abname === '-social') {
 			artboards.setActiveArtboardIndex(i)
-			process(artboards[i], socialPath, false)
+			process(artboards[i], socialPath)
 		}
 	}
 };
