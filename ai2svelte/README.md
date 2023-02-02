@@ -22,7 +22,7 @@ A version of [ai2html](https://github.com/newsdev/ai2html) designed specifically
 
 ```svelte
 <script>
-  import WorldMap.svelte from "components/WorldMap/WorldMap.svelte`
+  import WorldMap.svelte from "components/WorldMap/WorldMap.svelte"
 </script>
 
 <WorldMap />
