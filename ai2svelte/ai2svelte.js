@@ -64,9 +64,9 @@ function main() {
     output: "one-file", // Options: one-file, multiple-files
     project_name: "", // Defaults to the name of the AI file
     project_type: "",
-    html_output_path: "/ai2html-output/",
+    html_output_path: "/output/",
     html_output_extension: ".svelte",
-    image_output_path: "",
+    image_output_path: "./images/",
     image_source_path: null,
     image_alt_text: "",
     cache_bust_token: null, // Append a token to the url of image urls: ?v=<cache_bust_token>
@@ -1183,6 +1183,9 @@ function main() {
         imageData.html +
         textData.html +
         "\t</div>\r";
+
+      // ai2svelte
+      artboardContent.html += "{/if}";
 
       var abStyles = textData.styles;
       if (specialData && specialData.video) {
@@ -5184,25 +5187,39 @@ function main() {
     var inlineSpacerStyle = "";
     var html = "";
 
-    // Set size of graphic using inline CSS
-    if (widthRange[0] == widthRange[1]) {
-      // fixed width
-      // inlineSpacerStyle += "width:" + abBox.width + "px; height:" + abBox.height + "px;";
-      inlineStyle +=
-        "width:" + abBox.width + "px; height:" + abBox.height + "px;";
+    // // Set size of graphic using inline CSS
+    // if (widthRange[0] == widthRange[1]) {
+    //   // fixed width
+    //   // inlineSpacerStyle += "width:" + abBox.width + "px; height:" + abBox.height + "px;";
+    //   inlineStyle +=
+    //     "width:" + abBox.width + "px; height:" + abBox.height + "px;";
+    // } else {
+
+    // Set height of dynamic artboards using vertical padding as a %, to preserve aspect ratio.
+    inlineSpacerStyle =
+      "padding: 0 0 " + formatCssPct(abBox.height, abBox.width) + " 0;";
+
+    // ai2svelte
+    if (visibleRange[1] < Infinity) {
+      html +=
+        "{#if width && ( width >= " +
+        visibleRange[0] +
+        " && width <" +
+        (Number(visibleRange[1]) + 1) +
+        ")}";
     } else {
-      // Set height of dynamic artboards using vertical padding as a %, to preserve aspect ratio.
-      inlineSpacerStyle =
-        "padding: 0 0 " + formatCssPct(abBox.height, abBox.width) + " 0;";
-      if (widthRange[0] > 0) {
-        inlineStyle += "min-width: " + widthRange[0] + "px;";
-      }
-      if (widthRange[1] < Infinity) {
-        inlineStyle += "max-width: " + widthRange[1] + "px;";
-        inlineStyle +=
-          "max-height: " + Math.round(widthRange[1] / aspectRatio) + "px";
-      }
+      html += "{#if width && (width >= " + visibleRange[0] + ")}";
     }
+
+    // if (widthRange[0] > 0) {
+    //   inlineStyle += "min-width: " + widthRange[0] + "px;";
+    // }
+    // if (widthRange[1] < Infinity) {
+    //   inlineStyle += "max-width: " + widthRange[1] + "px;";
+    //   inlineStyle +=
+    //     "max-height: " + Math.round(widthRange[1] / aspectRatio) + "px";
+    // }
+    // }
 
     html +=
       '\t<div id="' +
@@ -5284,10 +5301,11 @@ function main() {
     css += t3 + "width:100% !important;";
     css += blockEnd;
 
-    css += blockStart + "." + getSymbolClass() + " {";
-    css += t3 + "position: absolute;";
-    css += t3 + "box-sizing: border-box;";
-    css += blockEnd;
+    // ai2svelte
+    // css += blockStart + "." + getSymbolClass() + " {";
+    // css += t3 + "position: absolute;";
+    // css += t3 + "box-sizing: border-box;";
+    // css += blockEnd;
 
     css +=
       blockStart + "." + nameSpace + "aiPointText p { white-space: nowrap; }\r";
@@ -5326,6 +5344,22 @@ function main() {
       lines.push(key + ": " + value);
     });
     return lines.join("\n");
+  }
+
+  // ai2svelte
+  // Sets the output necessary for the .svelte file
+  function outputSvelteJS(containerId, settings) {
+    var svelteJS = "<script>\r\t";
+
+    svelteJS += "\tlet width = null;\r";
+    // add prop for onmount function that defaults to noop
+    svelteJS += "import { onMount } from 'svelte';\n";
+    svelteJS += "export let onAiMounted = () => {};\r";
+    svelteJS += "onMount(() => {\r  onAiMounted();\r});\r";
+
+    svelteJS += "\r</script>\r";
+
+    return svelteJS;
   }
 
   function getResizerScript(containerId) {
@@ -5549,6 +5583,9 @@ function main() {
     var htmlFileDestinationFolder, htmlFileDestination;
     var containerClasses = "ai2html";
 
+    // ai2svelte
+    var svelteJS = outputSvelteJS(containerId, settings);
+
     progressBar.setTitle("Writing HTML output...");
 
     if (isTrue(settings.include_resizer_script)) {
@@ -5576,7 +5613,13 @@ function main() {
     }
 
     // HTML
-    html = '<div id="' + containerId + '" class="' + containerClasses + '">\r';
+    // ai2svelte: Adds bind:clientWidth
+    html =
+      '<div id="' +
+      containerId +
+      '" class="' +
+      containerClasses +
+      '" bind:clientWidth={width}>\r';
     if (linkSrc) {
       // optional link around content
       html +=
@@ -5590,22 +5633,23 @@ function main() {
 
     // CSS
     css =
-      '<style media="screen,print">\r' +
+      '<style lang="scss">\r' +
       generatePageCss(containerId, settings) +
       content.css +
       "\r</style>\r";
 
     // JS
-    js = content.js + responsiveJs;
+    // ai2svelte
+    js = svelteJS + content.js + responsiveJs;
 
     textForFile =
       "\r" +
       commentBlock +
-      css +
+      js +
       "\r" +
       html +
       "\r" +
-      js +
+      css +
       "<!-- End ai2html" +
       " - " +
       getDateTimeStamp() +
