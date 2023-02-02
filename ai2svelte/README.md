@@ -2,7 +2,7 @@
 
 A version of [ai2html](https://github.com/newsdev/ai2html) designed specifically to output Svelte components from AI files. Heavily informed by the [Reuters Graphics](https://github.com/reuters-graphics/ai2svelte) team's work on this.
 
-# How to use
+## How to use
 
 1. Make sure you have both `ai2svelte.js` and `ai2html-config.json` in your `Applications/[Adobe Illustrator]/Presets/en_US/Scripts` directory
 2. Copy the [ai2svelte](https://drive.google.com/drive/folders/1ya6nyGzHvoGcgkbvmyplePwqdBGuSCYZ) template from the team Drive folder to your project.
