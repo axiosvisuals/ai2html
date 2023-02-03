@@ -17,7 +17,7 @@ A version of [ai2html](https://github.com/newsdev/ai2html) designed specifically
 - `[Slug].svelte` - your Svelte component
 - `/images/` - Images directory that contains all the images needed for the graphic
 
-7. Copy the `/[slug]` output directory to your components directory in your Svelte project and rename accordingly.
+7. Copy the `/[slug]` output directory to your components directory in your Svelte project and rename accordingly. Depending on your project structure, that might look like `/src/lib/components/`.
 8. Import the AI component and use in your project
 
 ```svelte
