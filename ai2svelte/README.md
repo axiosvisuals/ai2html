@@ -12,12 +12,12 @@ A version of [ai2html](https://github.com/newsdev/ai2html) designed specifically
 - **Note:** We recommend **not** including the hed or dek of the chart in the Artboard. Instead, you can set it in Svelte.
 
 5. When you're ready, run `ai2svelte` (File --> Scripts --> ai2svelte)
-6. When the script runs, you should see an `/output` directory in the folder that contains:
+6. When the script runs, you should see a new directory titled `/[slug]` in the folder that contains:
 
 - `[Slug].svelte` - your Svelte component
 - `/images/` - Images directory that contains all the images needed for the graphic
 
-7. Copy the `/output` directory to your components directory in your Svelte project and rename accordingly.
+7. Copy the `/[slug]` output directory to your components directory in your Svelte project and rename accordingly.
 8. Import the AI component and use in your project
 
 ```svelte

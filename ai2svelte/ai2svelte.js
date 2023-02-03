@@ -1035,6 +1035,9 @@ function main() {
       createSettingsBlock(docSettings);
     }
 
+    //ai2svelte
+    docSettings.html_output_path = "/" + docName + "/";
+
     // render the document
     render(docSettings, textBlockData.code);
   } catch (e) {
